@@ -1,5 +1,7 @@
 # Bus-Off Attack Simulation
 
+**A project for the Cyber-Physical Systems and IoT Security course - MSc Computer Science - University of Padova.**
+
 This repository simulates a Bus-Off attack on a CAN (Controller Area Network) bus, showcasing the dynamics of error handling and frame arbitration in a vehicle communication system. The attack is aimed at forcing a victim ECU (Electronic Control Unit) into a bus-off state, rendering it incapable of communication.
 
 ## Project Structure
