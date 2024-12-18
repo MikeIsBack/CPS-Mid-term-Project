@@ -1,94 +1,86 @@
 class CANBus:
     def __init__(self):
         self.current_transmissions = []  # Tracks ongoing transmissions on the bus
+        # this array is used to detect whenever we have more than 1 msg
 
     def send_frame(self, frame, ecu):
         """Place a frame on the CAN bus."""
         self.current_transmissions.append((frame, ecu))  # Add frame to the queue
 
+
+    def handle_arbitration(self):
+        error_found = False
+        winner_frame, winner_ecu = self.current_transmissions[0]
+
+        for frame, ecu in self.current_transmissions:
+            # Check if IDs are identical, then compare DLC
+            if frame['id'] == winner_frame['id']:
+                # Compare DLC (dominant bit wins)
+                for bit_a, bit_b in zip(frame['dlc'], winner_frame['dlc']):
+                    if bit_a != bit_b:
+                        if bit_a == '0' and bit_b == '1':
+                            error_found = True
+                            winner_frame, winner_ecu = frame, ecu #switch to atker winner frame and ecu
+                        break
+        
+        return winner_frame, winner_ecu, error_found
+
+
     def resolve_collisions(self):
-        """Handle arbitration and collisions."""
-        if len(self.current_transmissions) > 1:
+        active_error_flag = {'id': "000000"}
+        passive_error_flag = {'id': "111111"}
+
+        if len(self.current_transmissions) > 1: #the collission is identified whenever we have >1 frame on the can bus
             print(f"[CANBus] Collision detected among {len(self.current_transmissions)} nodes.")
 
-            # Sort based on ID (lower ID wins)
-            self.current_transmissions.sort(key=lambda x: x[0]['id'])
-            winner_frame, winner_ecu = self.current_transmissions[0]
-            active_error_flag = False
-
-            for frame, ecu in self.current_transmissions:
-                if frame != winner_frame:
-                    # Check if IDs are identical, then compare DLC
-                    if frame['id'] == winner_frame['id']:
-                        # Compare DLC (dominant bit wins)
-                        for bit_a, bit_b in zip(frame['dlc'], winner_frame['dlc']):
-                            if bit_a != bit_b:
-                                if bit_a == '0' and bit_b == '1':
-                                    winner_frame, winner_ecu = frame, ecu
-                                    active_error_flag = True
-                                break
-
-            for frame, ecu in self.current_transmissions:
-                """The victim should transmit passive error flag"""
-                if ecu.name == "Victim" and ecu.is_error_passive:
-                    active_error_flag = False
-
-            if active_error_flag:
-                while not any(ecu.is_error_passive for _, ecu in self.current_transmissions if ecu.name == "Victim"):
-                    # Trigger CAN bus error handling mechanism
-                    for frame, ecu in self.current_transmissions:
-                        if ecu.is_error_passive:
-                            # Victim in Error-Passive: Transmit Passive Error Flag (111111)
-                            if ecu.name == "Victim":
-                                print(f"[{ecu.name}] In Error-Passive: Transmitting Passive Error Flag (111111).")
-                        else:
-                            # Victim in Error-Active: Transmit Active Error Flag (000000)
-                            if ecu.name == "Victim":
-                                print(f"[{ecu.name}] In Error-Active: Transmitting Active Error Flag (000000).")
-                        
-                        # Increment both TECs until the victim reaches error passive state
-                        ecu.increment_error_counter(is_transmit_error=True)
-
-                # Process attacker successful transmission
-                print(f"[CANBus] Frame successfully transmitted: {winner_frame['id']} by {winner_ecu.name}")
-                winner_ecu.decrement_error_counters()
-
-                # Increment victim TEC due to successful attacker transmission
-                for frame, ecu in self.current_transmissions:
-                    if ecu.name == "Victim":
-                        ecu.increment_error_counter(is_transmit_error=True)
-                        ecu.decrement_error_counters()
-
-                self.current_transmissions = []
-                return winner_frame
+            self.current_transmissions.sort(key=lambda x: x[0]['id']) 
+            #lower IDs goes first in the array of current transmission in the bus, so the winner frame will be the first one in the array
+            winner_frame, winner_ecu = self.current_transmissions[0] #will take the victim
             
-            else:
-                cont = 0
+            real_winner_frame, real_winner_ecu, error_found = self.handle_arbitration() #understand if there's an error
+            if(error_found and not winner_ecu.is_error_passive): 
+                self.current_transmissions.append((active_error_flag, winner_ecu)) #store who sent the error in the bus 
+                winner_ecu.increment_error_counter(is_transmit_error=True)
 
-                # Trigger CAN bus error handling mechanism
-                for frame, ecu in self.current_transmissions:
-                    if ecu.name == "Victim":
-                        # Victim in Error-Passive: Transmit Passive Error Flag (111111)
-                        print(f"[{ecu.name}] In Error-Passive: Transmitting Passive Error Flag (111111).")
-                        
-                        ecu.increment_error_counter(is_transmit_error=True)
-                        ecu.decrement_error_counters()
+            # if(self.current_transmissions.contains(active_error_flag)): 
+            #     real_winner_ecu.increment_error_counter(is_transmit_error=True)
+            if any(transmission[0] == active_error_flag for transmission in self.current_transmissions):
+                real_winner_ecu.increment_error_counter(is_transmit_error=True)
+
+
+            while any(flag[0] == active_error_flag for flag in self.current_transmissions): #retransmission
+                #self.current_transmissions.pop(active_error_flag)
+                self.current_transmissions = [t for t in self.current_transmissions if t[0] != active_error_flag]
+                real_winner_frame, real_winner_ecu, error_found = self.handle_arbitration()
+
+                if(error_found): 
+                    if(winner_ecu.is_error_passive):
+                        self.current_transmissions.append((passive_error_flag,winner_ecu)) #now victim ecu is in error passive mode
+                        print(f"[{winner_ecu.name}] In Error-Passive: Transmitting Passive Error Flag (111111).")
                     else:
-                        frame, sender = self.current_transmissions.pop(cont)
-                        print(f"[CANBus] Frame successfully transmitted: {frame['id']} by {sender.name}")
-                        sender.decrement_error_counters()
-                
-                    cont += 1
+                        self.current_transmissions.append((active_error_flag, winner_ecu)) #store who sent the error in the bus 
+                        print(f"[{winner_ecu.name}] In Error-Active: Transmitting Active Error Flag (000000).")
+                        winner_ecu.increment_error_counter(is_transmit_error=True)  
 
-                self.current_transmissions = []
-                return frame
-        
+                # if(self.current_transmissions.contains(active_error_flag)): 
+                #     real_winner_ecu.increment_error_counter(is_transmit_error=True)
+                if any(transmission[0] == active_error_flag for transmission in self.current_transmissions):
+                    real_winner_ecu.increment_error_counter(is_transmit_error=True)
+
+            winner_ecu.increment_error_counter(is_transmit_error=True) # victim increases its TEC due to failed passive error flag tx
+            #self.current_transmissions.pop((real_winner_ecu, real_winner_frame)) # attacker successfully transmits its frame
+            self.current_transmissions = [t for t in self.current_transmissions if t != (real_winner_frame, real_winner_ecu)]
+            print(f"[CANBus] Frame successfully transmitted: {real_winner_frame['id']} by {real_winner_ecu.name}")
+            real_winner_ecu.decrement_error_counters() # due to successful tx, attacker decreases its TEC
+            self.current_transmissions.clear() # victim successfully delivers its pending transmissions
+            winner_ecu.decrement_error_counters() # due to successful tx, victim decreases its TEC
+
         elif self.current_transmissions:
             frame, sender = self.current_transmissions.pop(0)
             print(f"[CANBus] Frame successfully transmitted: {frame['id']} by {sender.name}")
             sender.decrement_error_counters()
             return frame
-
+        
     def receive_frame(self):
         """Retrieve and process the next frame."""
         if not self.current_transmissions:  # Check if there are frames to process

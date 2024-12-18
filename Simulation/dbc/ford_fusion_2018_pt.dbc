@@ -1,0 +1,94 @@
+VERSION ""
+
+NS_ : 
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_:
+
+BU_: SensorECU MainECU SteeringECU
+
+BO_ 130 EPAS_INFO: 8 MainECU
+ SG_ SteMdule_U_Meas : 39|8@0+ (0.05,6.0) [0|25.5] "Volts" MainECU
+ SG_ SteMdule_I_Est : 21|12@0+ (0.05,-64.0) [-64|64] "Amps" MainECU
+ SG_ EPAS_FAILURE : 9|2@0+ (1,0) [0|3] "status" MainECU
+ SG_ SteeringColumnTorque : 7|8@0+ (0.0625,-8.0) [-8|8] "Nm" MainECU
+ SG_ SAPPAngleControlStat6 : 15|1@0+ (1,0) [0|1] "boolean" MainECU
+ SG_ SAPPAngleControlStat5 : 14|1@0+ (1,0) [0|1] "boolean" MainECU
+ SG_ SAPPAngleControlStat4 : 13|1@0+ (1,0) [0|1] "boolean" MainECU
+ SG_ SAPPAngleControlStat3 : 12|1@0+ (1,0) [0|1] "boolean" MainECU
+ SG_ SAPPAngleControlStat2 : 11|1@0+ (1,0) [0|1] "boolean" MainECU
+ SG_ SAPPAngleControlStat1 : 23|2@0+ (1,0) [0|3] "status" MainECU
+
+BO_ 118 Steering_Wheel_Data_CG1: 8 SteeringECU
+ SG_ SteWhlRelInit_An_Sns : 6|15@0+ (0.1,-1600.0) [-1600|1600] "deg" SteeringECU
+ SG_ SteWhlRelCalib_An_Sns : 23|15@0+ (0.1,-1600.0) [-1600|1600] "deg" SteeringECU
+ SG_ SteWhlRelInit2_An_Sns : 55|16@0+ (0.1,-3200.0) [-3200|3200] "deg" SteeringECU
+ SG_ SteWhlAn_No_Cs : 39|8@0+ (1,0) [0|255] "" SteeringECU
+ SG_ SteWhlAn_No_Cnt : 47|4@0+ (1,0) [0|15] "Counts" SteeringECU
+
+BO_ 131 Steering_Buttons: 8 SteeringECU
+ SG_ Right_Turn_Light : 5|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Left_Turn_Light : 4|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Dist_Decr : 12|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Dist_Incr : 11|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Cancel : 8|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Resume : 29|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Set : 28|1@0+ (1,0) [0|1] "boolean" SteeringECU
+ SG_ Main : 38|1@0+ (1,0) [0|1] "boolean" SteeringECU
+
+BO_ 145 Yaw_Data: 8 SensorECU
+ SG_ VehYaw_W_Actl : 39|16@0+ (0.0002,-6.5) [-6.5|6.5] "rad/s" SensorECU
+ SG_ VehRol_W_Actl : 23|16@0+ (0.0002,-6.5) [-6.5|6.5] "rad/s" SensorECU
+ SG_ VehPtch_W_Actl : 7|16@0+ (0.0002,-6.5) [-6.5|6.5] "rad/s" SensorECU
+
+BO_ 146 Accel_Data: 8 SensorECU
+ SG_ VehVertAActl_D_Qf : 38|2@0+ (1,0) [0|3] "quality" SensorECU
+ SG_ VehLongAActl_D_Qf : 22|2@0+ (1,0) [0|3] "quality" SensorECU
+ SG_ VehLatAActl_D_Qf : 6|2@0+ (1,0) [0|3] "quality" SensorECU
+ SG_ VehVert_A_Actl : 36|13@0+ (0.01,-40.0) [-40|40] "m/s^2" SensorECU
+ SG_ VehLong_A_Actl : 20|13@0+ (0.01,-40.0) [-40|40] "m/s^2" SensorECU
+ SG_ VehLat_A_Actl : 4|13@0+ (0.01,-40.0) [-40|40] "m/s^2" SensorECU
+
+BO_ 357 Cruise_Control: 8 MainECU
+ SG_ Cruise_State : 0|4@0+ (1,0) [0|15] "" MainECU
+
+BO_ 970 Lane_Keep_Assist_Control: 8 MainECU
+ SG_ Lkas_Action : 7|4@0+ (1,0) [0|15] "" MainECU
+ SG_ Lkas_Alert : 3|4@0+ (1,0) [0|15] "" MainECU
+ SG_ Lane_Curvature : 15|12@0+ (5e-06,-0.01) [-0.01|0.01] "1/m" MainECU
+ SG_ Steer_Angle_Req : 19|12@0+ (0.04297,-88.00445) [-88|88] "deg" MainECU
+
+VAL_ 357 Cruise_State 4 "active" 3 "standby" 0 "off" ;
+VAL_ 970 Lkas_Action 15 "off" 9 "abrupt" 8 "abrupt2" 5 "smooth" 4 "smooth2" ;
+VAL_ 970 Lkas_Alert 15 "no_alert" 3 "high_intensity" 2 "mid_intensity" 1 "low_intensity" ;
+VAL_ 972 LaActAvail_D_Actl 3 "available" 2 "tbd" 1 "not_available" 0 "fault" ;
+VAL_ 984 Lines_Hud 15 "none" 11 "grey_yellow" 8 "green_red" 7 "yellow_grey" 6 "grey_grey" 4 "red_green" 3 "green_green" ;
+
+CM_ SG_ 970 Lkas_Action "Only values 4, 5, 8, and 9 are used. 4 and 5 are smoother actions.";
