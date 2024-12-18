@@ -7,12 +7,12 @@ class VictimECU(ECU):
         self.preceded_frame = {
             "id": f"{0x080:011b}",
             "dlc": "0001",
-            "data": ["00000000"]
+            "data": ["01000100"]
         }
         self.periodic_frame = {
             "id": f"{0x100:011b}",
             "dlc": "0001",
-            "data": ["00000000"]
+            "data": ["00010010"]
         }
         self.non_periodic_id_range = (0x300, 0x3FF)
 

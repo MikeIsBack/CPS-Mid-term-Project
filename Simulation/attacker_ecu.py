@@ -88,6 +88,4 @@ class AttackerECU(ECU):
                 # Resolve collisions using the CAN bus logic
                 self.bus.receive_frame()
 
-                # TODO: after error handling mechanism the simulation "seems" to stop during execution (only by a logic point of view, the code works). This because current_time_ms is not incremented during frames auto-retransmissions, what to do?
-            
             current_time_ms += step 

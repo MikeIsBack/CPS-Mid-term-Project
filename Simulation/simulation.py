@@ -10,7 +10,7 @@ def simulate_bus_off_attack():
 
     # Phase 1: Pattern Analysis
     traffic = []
-    step = 100
+    step = 100 # every 100ms a frame is sent
     time_interval = 5000
     periodic_frame_interval = 500
     
