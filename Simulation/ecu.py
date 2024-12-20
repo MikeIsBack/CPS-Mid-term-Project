@@ -1,3 +1,4 @@
+from setup_logger import logger
 class ECU:
     def __init__(self, name, bus):
         self.name = name
@@ -5,6 +6,7 @@ class ECU:
         self.transmit_error_counter = 0
         self.is_error_passive = False
         self.is_bus_off = False
+        logger.debug(f"ECU's name: {self.name}'s TEC value: {self.transmit_error_counter} Passive error state: {self.is_error_passive} Bus-off state: {self.is_bus_off}")
 
     def send(self, frame):
         """Transmit a CAN frame."""
@@ -30,6 +32,7 @@ class ECU:
         """Increment the error counter."""
         increment = 8 if is_transmit_error else 0
         self.transmit_error_counter += increment
+        logger.debug(f"ECU's name: {self.name}'s TEC value: {self.transmit_error_counter} Passive error state: {self.is_error_passive} Bus-off state: {self.is_bus_off}")
 
         print(f"[{self.name}] Incremented {'Transmit' if is_transmit_error else 'Receive'} Error Counter. "
               f"TEC: {self.transmit_error_counter}")
@@ -44,6 +47,7 @@ class ECU:
     def decrement_error_counters(self):
         """Reduce error counters after successful operations."""
         self.transmit_error_counter = max(0, self.transmit_error_counter - 1)
+        logger.debug(f"ECU's name: {self.name}'s TEC value: {self.transmit_error_counter} Passive error state: {self.is_error_passive} Bus-off state: {self.is_bus_off}")
 
         if self.is_error_passive and self.transmit_error_counter <= 127:
             self.is_error_passive = False

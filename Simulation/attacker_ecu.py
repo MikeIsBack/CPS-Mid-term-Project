@@ -1,4 +1,4 @@
-import time
+import time #-> TO REMOVE IF NOT TESTED WITH 1000KBPS
 from ecu import ECU
 
 class AttackerECU(ECU):
@@ -55,10 +55,18 @@ class AttackerECU(ECU):
 
         """Tx parameters"""
         current_time_ms = 0
-        step = 100
-        periodic_frame_interval = 500
+        step = 1000
+        periodic_frame_interval = 4000
+
+        max_attack_time = 0.15  # Max time for the attack in seconds -> TO REMOVE IF NOT TESTED WITH 1000KBPS
+        start_time = time.time()  # Track the start time of the attack -> TO REMOVE IF NOT TESTED WITH 1000KBPS
 
         while not victim.is_bus_off:
+
+            if time.time() - start_time > max_attack_time: #-> TO REMOVE IF NOT TESTED WITH 1000KBPS
+                print(f"[{self.name}] Timeout reached, stopping the attack.")
+                break
+
             """Victim normal Tx behaviour"""
             if (current_time_ms + step) % periodic_frame_interval == 0:
                 victim.send_preceded_frame()  # Send the preceded frame

@@ -68,8 +68,8 @@ This repository simulates a Bus-Off attack on a simple CAN (Controller Area Netw
 - The victim transitions to `Error-Passive`, and the attacker continues transmitting until the victim enters `Bus-Off`.
 
 ### 2. **CAN Bus Error Handling**
-- **Error-Active:** TEC > 127; Active Error Flag (`000000`) is transmitted.
-- **Error-Passive:** TEC > 255; Passive Error Flag (`111111`) is transmitted.
+- **Error-Active:** TEC ≤ 127; Active Error Flag (`000000`) is transmitted.
+- **Error-Passive:** TEC > 127; Passive Error Flag (`111111`) is transmitted.
 - **Bus-Off:** TEC > 255; ECU stops communication.
 
 ### 3. **Key Attack Dynamics**

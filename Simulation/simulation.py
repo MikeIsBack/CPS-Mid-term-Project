@@ -1,7 +1,7 @@
-import random
 from can_bus import CANBus
 from victim_ecu import VictimECU
 from attacker_ecu import AttackerECU
+from setup_logger import logger
 
 def simulate_bus_off_attack():
     bus = CANBus()
@@ -10,11 +10,11 @@ def simulate_bus_off_attack():
 
     # Phase 1: Pattern Analysis
     traffic = []
-    step = 100 # every 100ms a frame is sent
-    time_interval = 5000
-    periodic_frame_interval = 500
+    step = 1000  # every x ms a frame is sent
+    time_interval = 10000 
+    periodic_frame_interval = 4000 # periodicity of the frame
     
-    for current_time_ms in range(0, time_interval, step):  # Simulate frame tx every 100ms
+    for current_time_ms in range(0, time_interval, step):  # Simulate frame tx every 
         if (current_time_ms + step) % periodic_frame_interval == 0:
             victim.send_preceded_frame()  # Send the preceded frame
         elif current_time_ms % periodic_frame_interval == 0:
@@ -26,7 +26,7 @@ def simulate_bus_off_attack():
         result = bus.receive_frame()
         if result:
             frame = result  # Get the frame and add to traffic
-            traffic.append(frame)  # Append the frame to traffic
+            traffic.append(frame)  
         else:
             print("[Simulation] No frames available at this time step.")
 
@@ -40,4 +40,9 @@ def simulate_bus_off_attack():
     else:
         print("[Simulation] No valid pattern identified; attack aborted.")
 
-simulate_bus_off_attack()
+
+for i in range(1,1001):
+    print(f"Executing the attack for the {i}-th time:")
+    simulate_bus_off_attack()
+    logger.debug(f"End of the {i}-th attack")
+
