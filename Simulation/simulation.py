@@ -10,9 +10,9 @@ def simulate_bus_off_attack():
 
     # Phase 1: Pattern Analysis
     traffic = []
-    step = 1000  # every x ms a frame is sent
+    step = 100  # every x ms a frame is sent
     time_interval = 10000 
-    periodic_frame_interval = 4000 # periodicity of the frame
+    periodic_frame_interval = 500 # periodicity of the frame
     
     for current_time_ms in range(0, time_interval, step):  # Simulate frame tx every 
         if (current_time_ms + step) % periodic_frame_interval == 0:
