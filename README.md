@@ -107,7 +107,3 @@ This repository simulates a Bus-Off attack on a simple CAN (Controller Area Netw
 [CANBus] Frame successfully transmitted: 0001000000 by Attacker.
 [Simulation] Victim has entered Bus-Off state.
 ```
-
-## Acknowledgments
-
-This simulation demonstrates the nuances of CAN bus behavior during a Bus-Off attack and highlights the importance of robust error-handling mechanisms in automotive security.
