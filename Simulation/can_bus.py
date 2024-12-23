@@ -42,14 +42,11 @@ class CANBus:
                 self.current_transmissions.append((active_error_flag, winner_ecu)) #store who sent the error in the bus 
                 winner_ecu.increment_error_counter(is_transmit_error=True)
 
-            # if(self.current_transmissions.contains(active_error_flag)): 
-            #     real_winner_ecu.increment_error_counter(is_transmit_error=True)
             if any(transmission[0] == active_error_flag for transmission in self.current_transmissions):
                 real_winner_ecu.increment_error_counter(is_transmit_error=True)
 
 
             while any(flag[0] == active_error_flag for flag in self.current_transmissions): #retransmission
-                #self.current_transmissions.pop(active_error_flag)
                 self.current_transmissions = [t for t in self.current_transmissions if t[0] != active_error_flag]
                 real_winner_frame, real_winner_ecu, error_found = self.handle_arbitration()
 
@@ -62,13 +59,11 @@ class CANBus:
                         print(f"[{winner_ecu.name}] In Error-Active: Transmitting Active Error Flag (000000).")
                         winner_ecu.increment_error_counter(is_transmit_error=True)  
 
-                # if(self.current_transmissions.contains(active_error_flag)): 
-                #     real_winner_ecu.increment_error_counter(is_transmit_error=True)
                 if any(transmission[0] == active_error_flag for transmission in self.current_transmissions):
                     real_winner_ecu.increment_error_counter(is_transmit_error=True)
 
             winner_ecu.increment_error_counter(is_transmit_error=True) # victim increases its TEC due to failed passive error flag tx
-            #self.current_transmissions.pop((real_winner_ecu, real_winner_frame)) # attacker successfully transmits its frame
+
             self.current_transmissions = [t for t in self.current_transmissions if t != (real_winner_frame, real_winner_ecu)]
             print(f"[CANBus] Frame successfully transmitted: {real_winner_frame['id']} by {real_winner_ecu.name}")
             real_winner_ecu.decrement_error_counters() # due to successful tx, attacker decreases its TEC
